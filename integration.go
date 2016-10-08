@@ -65,7 +65,7 @@ func connect(apiKey string) (*websocket.Conn, botID, error) {
 }
 
 type Message struct {
-	Id      int    `json:"id,omitempty"`
+	ID      int    `json:"id,omitempty"`
 	Type    string `json:"type"`
 	Channel string `json:"channel"`
 	Text    string `json:"text"`
@@ -80,6 +80,6 @@ var messageNumber int
 
 func postMessage(ws *websocket.Conn, msg *Message) error {
 	messageNumber++
-	msg.Id = messageNumber
+	msg.ID = messageNumber
 	return websocket.JSON.Send(ws, msg)
 }

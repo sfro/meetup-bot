@@ -40,16 +40,29 @@ func verifyConnection(ws *websocket.Conn) error {
 
 func listen(ws *websocket.Conn, botID botID) {
 	for {
-		msg, err := getMessage(ws)
+		receivedMsg, err := getMessage(ws)
 		if err != nil {
 			log.Fatal(err)
 		}
 
-		log.Printf("Message:%+v\n\n", msg)
+		log.Printf("Message:%+v", receivedMsg)
 
-		if msg.Type == "message" {
-			if strings.Contains(msg.Text, fmt.Sprintf("<@%s>", botID)) {
+		if receivedMsg.Type == "message" {
+			if strings.Contains(receivedMsg.Text, fmt.Sprintf("<@%s>", botID)) {
 				log.Printf("Bot mentioned!")
+
+				if strings.Contains(strings.ToLower(receivedMsg.Text), "good morning") {
+					returnMsg := &Message{
+						Type:    "message",
+						Channel: receivedMsg.Channel,
+						Text:    "Good morning! (/◕ヮ◕)/",
+					}
+
+					err = postMessage(ws, returnMsg)
+					if err != nil {
+						log.Printf("ERROR: Error posting message: %+v", returnMsg)
+					}
+				}
 			}
 		}
 	}

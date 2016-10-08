@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"strings"
+	"time"
 
 	"golang.org/x/net/websocket"
 )
@@ -51,17 +52,31 @@ func listen(ws *websocket.Conn, botID botID) {
 			if strings.Contains(receivedMsg.Text, fmt.Sprintf("<@%s>", botID)) {
 				log.Printf("Bot mentioned!")
 
-				if strings.Contains(strings.ToLower(receivedMsg.Text), "good morning") {
-					returnMsg := &Message{
-						Type:    "message",
-						Channel: receivedMsg.Channel,
-						Text:    "Good morning! (/◕ヮ◕)/",
-					}
+				returnMsg := &Message{
+					Type:    "message",
+					Channel: receivedMsg.Channel,
+				}
 
-					err = postMessage(ws, returnMsg)
+				if strings.Contains(strings.ToLower(receivedMsg.Text), "good morning") {
+					returnMsg.Text = "Good morning! (/◕ヮ◕)/"
+				}
+
+				if strings.Contains(strings.ToLower(receivedMsg.Text), "get meetup suggestion") {
+					result, err := meetupSuggestion()
 					if err != nil {
-						log.Printf("ERROR: Error posting message: %+v", returnMsg)
+						log.Printf("ERROR: Error getting meetup suggestion: %+v", err)
+						returnMsg.Text = "Failed getting a suggestion! (ToT)"
+					} else {
+						returnMsg.Text = fmt.Sprintf("Group *%s* is having meetup *%s*!\n", result.Group.Who, result.Name)
+						returnMsg.Text += fmt.Sprintf("It's at *%s* and has *%v* spaces left!\n", time.Unix(result.Time/1000, 0).Format(time.UnixDate), result.RSVPLimit-result.YesRSVPCount)
+						returnMsg.Text += fmt.Sprintf("You can RSVP here (^_-)-☆  %v", result.EventURL)
 					}
+				}
+
+				err = postMessage(ws, returnMsg)
+				if err != nil {
+					log.Printf("ERROR: Error posting message: %+v", err)
+
 				}
 			}
 		}

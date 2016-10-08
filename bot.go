@@ -20,7 +20,7 @@ func main() {
 		log.Fatal(err)
 	}
 
-	listen(ws)
+	listen(ws, botID)
 }
 
 func verifyConnection(ws *websocket.Conn) error {
@@ -37,7 +37,7 @@ func verifyConnection(ws *websocket.Conn) error {
 	return nil
 }
 
-func listen(ws *websocket.Conn) {
+func listen(ws *websocket.Conn, botID botID) {
 	for {
 		msg, err := getMessage(ws)
 		if err != nil {

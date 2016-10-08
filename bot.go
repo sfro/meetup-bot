@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"log"
+	"strings"
 
 	"golang.org/x/net/websocket"
 )
@@ -13,7 +14,7 @@ func main() {
 		log.Fatal(err)
 	}
 
-	fmt.Printf("Connected with bot ID %q\n", botID)
+	log.Printf("Connected with bot ID %q\n", botID)
 
 	err = verifyConnection(ws)
 	if err != nil {
@@ -44,6 +45,12 @@ func listen(ws *websocket.Conn, botID botID) {
 			log.Fatal(err)
 		}
 
-		fmt.Printf("Message:%+v\n\n", msg)
+		log.Printf("Message:%+v\n\n", msg)
+
+		if msg.Type == "message" {
+			if strings.Contains(msg.Text, fmt.Sprintf("<@%s>", botID)) {
+				log.Printf("Bot mentioned!")
+			}
+		}
 	}
 }

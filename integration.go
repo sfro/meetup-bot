@@ -16,17 +16,17 @@ type startResponse struct {
 	Self  self   `json:"self"`
 }
 
-type botId string
+type botID string
 
 type self struct {
-	Id             botId                  `json:"id"`
+	ID             botID                  `json:"id"`
 	Name           string                 `json:"name"`
 	Prefs          map[string]interface{} `json:"prefs"`
 	Created        int                    `json:"created"`
 	ManualPresence string                 `json:"manual_presence"`
 }
 
-func connect(apiKey string) (*websocket.Conn, botId, error) {
+func connect(apiKey string) (*websocket.Conn, botID, error) {
 	resp, err := http.Get(fmt.Sprintf("https://slack.com/api/rtm.start?token=%s", apiKey))
 	if err != nil {
 		return nil, "", err
@@ -61,7 +61,7 @@ func connect(apiKey string) (*websocket.Conn, botId, error) {
 	}
 
 	// Return the bot ID, it is the ID that is returned in meesages when the bot is mentioned
-	return webSocket, startResponse.Self.Id, nil
+	return webSocket, startResponse.Self.ID, nil
 }
 
 type Message struct {

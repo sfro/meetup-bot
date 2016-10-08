@@ -59,9 +59,8 @@ func listen(ws *websocket.Conn, botID botID) {
 
 				if strings.Contains(strings.ToLower(receivedMsg.Text), "good morning") {
 					returnMsg.Text = "Good morning! (/◕ヮ◕)/"
-				}
-
-				if strings.Contains(strings.ToLower(receivedMsg.Text), "get meetup suggestion") {
+				} else if strings.Contains(strings.ToLower(receivedMsg.Text), "meetup") &&
+					strings.Contains(strings.ToLower(receivedMsg.Text), "suggest") {
 					result, err := meetupSuggestion()
 					if err != nil {
 						log.Printf("ERROR: Error getting meetup suggestion: %+v", err)
@@ -71,6 +70,8 @@ func listen(ws *websocket.Conn, botID botID) {
 						returnMsg.Text += fmt.Sprintf("It's at *%s* and has *%v* spaces left!\n", time.Unix(result.Time/1000, 0).Format(time.UnixDate), result.RSVPLimit-result.YesRSVPCount)
 						returnMsg.Text += fmt.Sprintf("You can RSVP here (^_-)-☆  %v", result.EventURL)
 					}
+				} else {
+					returnMsg.Text = "What do you want from me? (ToT)"
 				}
 
 				err = postMessage(ws, returnMsg)
